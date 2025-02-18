@@ -8,12 +8,9 @@ import com.example.microservice.technology.technology_microservice.domain.model.
 import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
-import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.example.microservice.technology.technology_microservice.domain.utils.constants.ConstansDomain.MAX_LENGTH_TECHNOLOGY_DESCRIPTION;
-import static com.example.microservice.technology.technology_microservice.domain.utils.constants.ConstansDomain.MAX_LENGTH_TECHNOLOGY_NAME;
+import static com.example.microservice.technology.technology_microservice.domain.utils.constants.ConstansDomain.*;
 
 public class TechnologyUseCase implements ITechnologyServicePort {
 
@@ -29,7 +26,7 @@ public class TechnologyUseCase implements ITechnologyServicePort {
                 .then(existTechnology(technologyModel.getName()))
                 .flatMap(exists -> {
                     if (exists) {
-                        return Mono.error(new AlreadyExistsException("Technology already exists"));
+                        return Mono.error(new AlreadyExistsException(TECHNOLOGY_NAME_ALREADY_EXISTS));
                     }
                     return technologyPersistencePort.saveTechnology(technologyModel);
                 });
@@ -38,17 +35,16 @@ public class TechnologyUseCase implements ITechnologyServicePort {
 
     public Mono<Void> validateTechnologyAndNameLenght(TechnologyModel technologyModel) {
         if(technologyModel.getName().length() > MAX_LENGTH_TECHNOLOGY_NAME){
-            return Mono.error(new NameTooLongException("Nombre de la technology excede " + MAX_LENGTH_TECHNOLOGY_NAME));
+            return Mono.error(new NameTooLongException(String.format(TECHNOLOGY_NAME_TOO_LONG, MAX_LENGTH_TECHNOLOGY_NAME)));
         }
         if(technologyModel.getDescription().length() > MAX_LENGTH_TECHNOLOGY_DESCRIPTION){
-            return Mono.error(new DescriptionTooLongException("Descripción excede " + MAX_LENGTH_TECHNOLOGY_DESCRIPTION));
+            return Mono.error(new DescriptionTooLongException(String.format(TECHNOLOGY_DESCRIPTION_TOO_LONG, MAX_LENGTH_TECHNOLOGY_DESCRIPTION)));
         }
         return Mono.empty();
     }
 
     public Mono<Boolean> existTechnology(String technologyName) {
-        Mono<Boolean> bolean = technologyPersistencePort.existTechnologyByName(technologyName);
-        return bolean;
+        return technologyPersistencePort.existTechnologyByName(technologyName);
     }
 
     @Override
