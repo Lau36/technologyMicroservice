@@ -1,4 +1,5 @@
 package com.example.microservice.technology.technology_microservice.infrastructure.utils.constans;
 
-public class constansInfra {
+public class ConstansInfra {
+    public static final String TECHNOLOGY_PATH = "technology";
 }
