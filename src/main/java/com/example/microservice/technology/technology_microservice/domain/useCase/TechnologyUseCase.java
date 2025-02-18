@@ -3,17 +3,23 @@ package com.example.microservice.technology.technology_microservice.domain.useCa
 import com.example.microservice.technology.technology_microservice.domain.exceptions.AlreadyExistsException;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.DescriptionTooLongException;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.NameTooLongException;
+import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
+import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
 import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static com.example.microservice.technology.technology_microservice.domain.utils.constants.ConstansDomain.MAX_LENGTH_TECHNOLOGY_DESCRIPTION;
 import static com.example.microservice.technology.technology_microservice.domain.utils.constants.ConstansDomain.MAX_LENGTH_TECHNOLOGY_NAME;
 
-@RequiredArgsConstructor
 public class TechnologyUseCase implements ITechnologyServicePort {
+
+    public TechnologyUseCase(ITechnologyPersistencePort technologyPersistencePort) {
+        this.technologyPersistencePort = technologyPersistencePort;
+    }
 
     private final ITechnologyPersistencePort technologyPersistencePort;
 
@@ -44,4 +50,10 @@ public class TechnologyUseCase implements ITechnologyServicePort {
         Mono<Boolean> bolean = technologyPersistencePort.existTechnologyByName(technologyName);
         return bolean;
     }
+
+    @Override
+    public Mono<PaginatedTechnologiesModel> listTechnologies(PaginationModel paginationModel) {
+        return technologyPersistencePort.getAllTechnologies(paginationModel);
+    }
+
 }
