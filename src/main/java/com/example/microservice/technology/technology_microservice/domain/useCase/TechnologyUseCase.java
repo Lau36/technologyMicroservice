@@ -62,7 +62,7 @@ public class TechnologyUseCase implements ITechnologyServicePort {
         return existTechnologiesByIds(technologiesCapacityModel.getTechnologiesId())
                 .flatMap(exist -> {
                     if (!exist) {
-                        return Mono.error(new IllegalArgumentException("Algunas tecnologías no existen."));
+                        return Mono.error(new IllegalArgumentException(SOME_TECHNOLOGIES_DOESNT_EXISTS));
                     }
 
                     List<TechnologyCapacityModel> associations = technologiesCapacityModel.getTechnologiesId().stream()
