@@ -3,14 +3,17 @@ package com.example.microservice.technology.technology_microservice.infrastructu
 import com.example.microservice.technology.technology_microservice.application.dto.request.TechnologiesCapacityRequest;
 import com.example.microservice.technology.technology_microservice.application.dto.request.TechnologiesIdsRequest;
 import com.example.microservice.technology.technology_microservice.application.dto.request.TechnologyRequest;
+import com.example.microservice.technology.technology_microservice.application.dto.response.TechnologyResponse;
 import com.example.microservice.technology.technology_microservice.application.handler.ITechnologyRestHandler;
 import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
 import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
+import com.example.microservice.technology.technology_microservice.domain.model.TechnologyWithNameModel;
 import com.example.microservice.technology.technology_microservice.domain.utils.SortDirection;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
@@ -49,6 +52,15 @@ public class TechnologyController {
     public Mono<ResponseEntity<Void>> associateTechnologies(@RequestBody TechnologiesCapacityRequest request) {
         return technologyRestHandler.associateTechnologiesAndCapacities(request)
                 .then(Mono.just(ResponseEntity.status(HttpStatus.CREATED).build()));
+
+    }
+
+    @GetMapping("/get")
+    public Flux<TechnologyResponse> getTechnologies(@RequestParam Integer capacityId) {
+        return technologyRestHandler.getAllTechnologiesByCapacityId(capacityId.longValue()).map(
+                technology ->
+                        new TechnologyResponse(technology.getId(), technology.getName())
+        );
 
     }
 }

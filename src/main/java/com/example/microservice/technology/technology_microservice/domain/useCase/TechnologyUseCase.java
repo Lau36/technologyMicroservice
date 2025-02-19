@@ -6,6 +6,7 @@ import com.example.microservice.technology.technology_microservice.domain.except
 import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -70,6 +71,11 @@ public class TechnologyUseCase implements ITechnologyServicePort {
 
                     return technologyPersistencePort.saveAll(associations).then();
                 });
+    }
+
+    @Override
+    public Flux<TechnologyWithNameModel> getAllTechnologiesByCapacityId(Long capacityId) {
+        return technologyPersistencePort.getAllTechnologiesByCapacityId(capacityId);
     }
 
 }
