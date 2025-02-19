@@ -8,6 +8,7 @@ import com.example.microservice.technology.technology_microservice.domain.ports.
 import com.example.microservice.technology.technology_microservice.domain.useCase.TechnologyUseCase;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.adapter.TechnologyAdapter;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.mapper.TechnologyMapper;
+import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.repository.ITechnologyCapacityRepository;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.repository.ITechnologyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class BeanConfig {
     private final ITechnologyRepository technologyRepository;
+    private final ITechnologyCapacityRepository technologyCapacityRepository;
     private final TechnologyMapper technologyMapper;
 
     private final TechnologyMapperApplication technologyMapperApplication;
@@ -29,7 +31,7 @@ public class BeanConfig {
 
     @Bean
     public ITechnologyPersistencePort technologyPersistencePort() {
-        return new TechnologyAdapter(technologyRepository, technologyMapper);
+        return new TechnologyAdapter(technologyRepository, technologyCapacityRepository, technologyMapper);
     }
 
     @Bean

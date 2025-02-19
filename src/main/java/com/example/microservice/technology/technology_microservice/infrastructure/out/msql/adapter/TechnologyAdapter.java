@@ -2,10 +2,13 @@ package com.example.microservice.technology.technology_microservice.infrastructu
 
 import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
 import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
+import com.example.microservice.technology.technology_microservice.domain.model.TechnologyCapacityModel;
 import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
+import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.entity.TechnologyCapacityEntity;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.entity.TechnologyEntity;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.mapper.TechnologyMapper;
+import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.repository.ITechnologyCapacityRepository;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.repository.ITechnologyRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,7 @@ import static com.example.microservice.technology.technology_microservice.infras
 public class TechnologyAdapter implements ITechnologyPersistencePort {
 
     private final ITechnologyRepository repository;
+    private final ITechnologyCapacityRepository technologyCapacityRepository;
     private final TechnologyMapper mapper;
 
     @Override
@@ -53,6 +57,22 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
                         tuple.getT2(),
                         (int) Math.ceil((double) tuple.getT2()) / paginationModel.getSize()
                 ));
+    }
+
+    @Override
+    public Mono<Boolean> existTechnologiesByIds(List<Long> technologiesId) {
+        return repository.countByIdIn(technologiesId)
+                .map(count -> count == technologiesId.size());
+    }
+
+    @Override
+    public Mono<Void> saveAll(List<TechnologyCapacityModel> technologiesCapacityModelList) {
+
+        List<TechnologyCapacityEntity> entities = technologiesCapacityModelList.stream().map(
+                model -> new TechnologyCapacityEntity(model.getId(), model.getTechnologyId(), model.getCapacityId())
+        ).toList();
+
+        return technologyCapacityRepository.saveAll(entities).then();
     }
 
     public TechnologyModel toModel(TechnologyEntity technologyEntity) {

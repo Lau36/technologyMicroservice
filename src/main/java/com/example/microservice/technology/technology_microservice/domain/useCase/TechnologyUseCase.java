@@ -3,12 +3,12 @@ package com.example.microservice.technology.technology_microservice.domain.useCa
 import com.example.microservice.technology.technology_microservice.domain.exceptions.AlreadyExistsException;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.DescriptionTooLongException;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.NameTooLongException;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
-import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
+import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static com.example.microservice.technology.technology_microservice.domain.utils.constants.ConstansDomain.*;
 
@@ -50,6 +50,26 @@ public class TechnologyUseCase implements ITechnologyServicePort {
     @Override
     public Mono<PaginatedTechnologiesModel> listTechnologies(PaginationModel paginationModel) {
         return technologyPersistencePort.getAllTechnologies(paginationModel);
+    }
+
+    @Override
+    public Mono<Boolean> existTechnologiesByIds(List<Long> technologiesId) {
+        return technologyPersistencePort.existTechnologiesByIds(technologiesId);
+    }
+
+    @Override
+    public Mono<Void> associateTechnologiesAndCapacities(TechnologiesCapacityModel technologiesCapacityModel) {
+        return existTechnologiesByIds(technologiesCapacityModel.getTechnologiesId())
+                .flatMap(exist -> {
+                    if (!exist) {
+                        return Mono.error(new IllegalArgumentException(SOME_TECHNOLOGIES_DOESNT_EXISTS));
+                    }
+
+                    List<TechnologyCapacityModel> associations = technologiesCapacityModel.getTechnologiesId().stream()
+                            .map(techId -> new TechnologyCapacityModel(null, techId, technologiesCapacityModel.getCapacityId())).toList();
+
+                    return technologyPersistencePort.saveAll(associations).then();
+                });
     }
 
 }
