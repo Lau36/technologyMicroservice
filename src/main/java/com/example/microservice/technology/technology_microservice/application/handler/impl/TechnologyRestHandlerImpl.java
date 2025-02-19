@@ -1,13 +1,17 @@
 package com.example.microservice.technology.technology_microservice.application.handler.impl;
 
+import com.example.microservice.technology.technology_microservice.application.dto.request.TechnologiesCapacityRequest;
 import com.example.microservice.technology.technology_microservice.application.dto.request.TechnologyRequest;
 import com.example.microservice.technology.technology_microservice.application.handler.ITechnologyRestHandler;
 import com.example.microservice.technology.technology_microservice.application.mapper.TechnologyMapperApplication;
 import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
 import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
+import com.example.microservice.technology.technology_microservice.domain.model.TechnologiesCapacityModel;
 import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 
 public class TechnologyRestHandlerImpl implements ITechnologyRestHandler {
@@ -31,5 +35,20 @@ public class TechnologyRestHandlerImpl implements ITechnologyRestHandler {
     @Override
     public Mono<PaginatedTechnologiesModel> getTechnologies(PaginationModel paginationModel) {
         return technologyServicePort.listTechnologies(paginationModel);
+    }
+
+    @Override
+    public Mono<Boolean> existTechnologiesByIds(List<Long> technologiesId) {
+        return technologyServicePort.existTechnologiesByIds(technologiesId);
+    }
+
+    @Override
+    public Mono<Void> associateTechnologiesAndCapacities(TechnologiesCapacityRequest technologiesCapacityRequest) {
+        TechnologiesCapacityModel model = new TechnologiesCapacityModel(
+                null,
+                technologiesCapacityRequest.getCapacityId(),
+                technologiesCapacityRequest.getTechnologiesId()
+        );
+        return technologyServicePort.associateTechnologiesAndCapacities(model);
     }
 }
