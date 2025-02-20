@@ -12,5 +12,5 @@ public interface ITechnologyPersistencePort {
     Mono<PaginatedTechnologiesModel> getAllTechnologies(PaginationModel paginationModel);
     Mono<Boolean> existTechnologiesByIds(List<Long> technologiesId);
     Mono<Void> saveAll(List<TechnologyCapacityModel> technologiesCapacityModelList);
-
+    Flux<TechnologyWithNameModel> getAllTechnologiesByCapacityId(Long capacityId);
 }

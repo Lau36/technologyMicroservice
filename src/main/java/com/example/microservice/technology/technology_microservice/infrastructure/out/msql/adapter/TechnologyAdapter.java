@@ -1,9 +1,6 @@
 package com.example.microservice.technology.technology_microservice.infrastructure.out.msql.adapter;
 
-import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
-import com.example.microservice.technology.technology_microservice.domain.model.TechnologyCapacityModel;
-import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
+import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.entity.TechnologyCapacityEntity;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.entity.TechnologyEntity;
@@ -15,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -73,6 +71,16 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
         ).toList();
 
         return technologyCapacityRepository.saveAll(entities).then();
+    }
+
+    @Override
+    public Flux<TechnologyWithNameModel> getAllTechnologiesByCapacityId(Long capacityId) {
+        return repository.findTechnologiesByCapacityId(capacityId)
+                .map(technology ->
+                        new TechnologyWithNameModel(
+                                technology.getId(),
+                                technology.getName()
+                        ));
     }
 
     public TechnologyModel toModel(TechnologyEntity technologyEntity) {

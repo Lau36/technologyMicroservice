@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface ITechnologyCapacityRepository extends R2dbcRepository<TechnologyCapacityEntity, Long> {
     Flux<TechnologyCapacityEntity> saveAll(List<TechnologyCapacityEntity> technologyEntities);
+    Flux<TechnologyCapacityEntity> findAllById(Long id);
 }

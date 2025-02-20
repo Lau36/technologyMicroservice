@@ -3,9 +3,7 @@ package com.example.microservice.technology.technology_microservice.domain;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.AlreadyExistsException;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.DescriptionTooLongException;
 import com.example.microservice.technology.technology_microservice.domain.exceptions.NameTooLongException;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
-import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
+import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
 import com.example.microservice.technology.technology_microservice.domain.useCase.TechnologyUseCase;
 import com.example.microservice.technology.technology_microservice.domain.utils.SortDirection;
@@ -15,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -112,4 +111,117 @@ public class TechnologyUseCaseTest {
 
         verify(technologyPersistencePort, times(1)).getAllTechnologies(paginationModel);
     }
+
+    @Test
+    void ifTechnologiesExist_shouldReturnTrue(){
+        List<Long> listTechnologiesIds = List.of(1L, 2L);
+
+        Mockito.when(technologyPersistencePort.existTechnologiesByIds(listTechnologiesIds)).thenReturn(Mono.just(true));
+
+        Mono<Boolean> result = technologyUseCase.existTechnologiesByIds(listTechnologiesIds);
+
+        StepVerifier.create(result)
+                .expectNext(true)
+                .verifyComplete();
+
+        verify(technologyPersistencePort, times(1)).existTechnologiesByIds(listTechnologiesIds);
+    }
+
+    @Test
+    void ifTechnologiesExist_shouldReturnFalse(){
+        List<Long> listTechnologiesIds = List.of(1L, 2L);
+
+        Mockito.when(technologyPersistencePort.existTechnologiesByIds(listTechnologiesIds)).thenReturn(Mono.just(false));
+
+        Mono<Boolean> result = technologyUseCase.existTechnologiesByIds(listTechnologiesIds);
+
+        StepVerifier.create(result)
+                .expectNext(false)
+                .verifyComplete();
+
+        verify(technologyPersistencePort, times(1)).existTechnologiesByIds(listTechnologiesIds);
+    }
+
+    @Test
+    void getAllTechnologies_shouldReturnTechnologies(){
+        TechnologyWithNameModel technology = new TechnologyWithNameModel(1L, "Technology 1");
+        Long capacityId = 1L;
+
+        Mockito.when(technologyPersistencePort.getAllTechnologiesByCapacityId(capacityId)).thenReturn(Flux.just(technology));
+
+        Flux<TechnologyWithNameModel> result = technologyUseCase.getAllTechnologiesByCapacityId(capacityId);
+
+        StepVerifier.create(result).expectNext(technology).verifyComplete();
+
+        verify(technologyPersistencePort, times(1)).getAllTechnologiesByCapacityId(capacityId);
+    }
+
+    @Test
+    void associateTechnologiesAndCapacities_Success() {
+
+        List<Long> techIds = List.of(1L, 2L, 3L);
+        Long capacityId = 100L;
+        Long technologyId = 10L;
+        TechnologiesCapacityModel inputModel = new TechnologiesCapacityModel(technologyId, capacityId, techIds);
+
+        Mockito.when(technologyPersistencePort.existTechnologiesByIds(techIds)).thenReturn(Mono.just(true));
+        Mockito.when(technologyPersistencePort.saveAll(Mockito.anyList())).thenReturn(Mono.empty());
+
+
+        Mono<Void> result = technologyUseCase.associateTechnologiesAndCapacities(inputModel);
+
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        verify(technologyPersistencePort, times(1)).existTechnologiesByIds(techIds);
+        verify(technologyPersistencePort, times(1)).saveAll(anyList());
+    }
+
+    @Test
+    void associateTechnologiesAndCapacities_Fail_TechnologiesNotFound() {
+
+        List<Long> techIds = List.of(1L, 2L, 3L);
+        Long capacityId = 100L;
+        Long technologyId = 10L;
+        TechnologiesCapacityModel inputModel = new TechnologiesCapacityModel(technologyId, capacityId, techIds);
+
+        when(technologyPersistencePort.existTechnologiesByIds(techIds)).thenReturn(Mono.just(false));
+
+
+        Mono<Void> result = technologyUseCase.associateTechnologiesAndCapacities(inputModel);
+
+
+        StepVerifier.create(result)
+                .expectError(IllegalArgumentException.class)
+                .verify();
+
+        verify(technologyPersistencePort, times(1)).existTechnologiesByIds(techIds);
+    }
+
+    @Test
+    void associateTechnologiesAndCapacities_Fail_SaveAllThrowsError() {
+
+        List<Long> techIds = List.of(1L, 2L, 3L);
+        Long capacityId = 100L;
+        Long technologyId = 10L;
+        TechnologiesCapacityModel inputModel = new TechnologiesCapacityModel(technologyId, capacityId, techIds);
+
+        when(technologyPersistencePort.existTechnologiesByIds(techIds)).thenReturn(Mono.just(true));
+        when(technologyPersistencePort.saveAll(anyList())).thenReturn(Mono.error(new RuntimeException("DB Error")));
+
+
+        Mono<Void> result = technologyUseCase.associateTechnologiesAndCapacities(inputModel);
+
+
+        StepVerifier.create(result)
+                .expectError(RuntimeException.class)
+                .verify();
+
+        verify(technologyPersistencePort, times(1)).existTechnologiesByIds(techIds);
+        verify(technologyPersistencePort, times(1)).saveAll(anyList());
+    }
+
+
+
 }
