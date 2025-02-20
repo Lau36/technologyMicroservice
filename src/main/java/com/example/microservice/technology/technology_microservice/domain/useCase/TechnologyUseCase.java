@@ -33,7 +33,6 @@ public class TechnologyUseCase implements ITechnologyServicePort {
                 });
     }
 
-
     public Mono<Void> validateTechnologyAndNameLenght(TechnologyModel technologyModel) {
         if(technologyModel.getName().length() > MAX_LENGTH_TECHNOLOGY_NAME){
             return Mono.error(new NameTooLongException(String.format(TECHNOLOGY_NAME_TOO_LONG, MAX_LENGTH_TECHNOLOGY_NAME)));
@@ -60,7 +59,7 @@ public class TechnologyUseCase implements ITechnologyServicePort {
 
     @Override
     public Mono<Void> associateTechnologiesAndCapacities(TechnologiesCapacityModel technologiesCapacityModel) {
-        return existTechnologiesByIds(technologiesCapacityModel.getTechnologiesId())
+        return technologyPersistencePort.existTechnologiesByIds(technologiesCapacityModel.getTechnologiesId())
                 .flatMap(exist -> {
                     if (!exist) {
                         return Mono.error(new IllegalArgumentException(SOME_TECHNOLOGIES_DOESNT_EXISTS));
