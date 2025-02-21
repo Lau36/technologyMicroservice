@@ -6,6 +6,10 @@ import com.example.microservice.technology.technology_microservice.application.h
 import com.example.microservice.technology.technology_microservice.application.mapper.TechnologyMapperApplication;
 import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
+import com.example.microservice.technology.technology_microservice.domain.utils.PaginatedTechnologies;
+import com.example.microservice.technology.technology_microservice.domain.utils.Pagination;
+import com.example.microservice.technology.technology_microservice.domain.utils.TechnologiesCapacity;
+import com.example.microservice.technology.technology_microservice.domain.utils.TechnologyWithIdAndName;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,8 +35,8 @@ public class TechnologyRestHandlerImpl implements ITechnologyRestHandler {
     }
 
     @Override
-    public Mono<PaginatedTechnologiesModel> getTechnologies(PaginationModel paginationModel) {
-        return technologyServicePort.listTechnologies(paginationModel);
+    public Mono<PaginatedTechnologies> getTechnologies(Pagination pagination) {
+        return technologyServicePort.listTechnologies(pagination);
     }
 
     @Override
@@ -42,7 +46,7 @@ public class TechnologyRestHandlerImpl implements ITechnologyRestHandler {
 
     @Override
     public Mono<Void> associateTechnologiesAndCapacities(TechnologiesCapacityRequest technologiesCapacityRequest) {
-        TechnologiesCapacityModel model = new TechnologiesCapacityModel(
+        TechnologiesCapacity model = new TechnologiesCapacity(
                 null,
                 technologiesCapacityRequest.getCapacityId(),
                 technologiesCapacityRequest.getTechnologiesId()
@@ -51,7 +55,7 @@ public class TechnologyRestHandlerImpl implements ITechnologyRestHandler {
     }
 
     @Override
-    public Flux<TechnologyWithNameModel> getAllTechnologiesByCapacityId(Long capacityId) {
+    public Flux<TechnologyWithIdAndName> getAllTechnologiesByCapacityId(Long capacityId) {
         return technologyServicePort.getAllTechnologiesByCapacityId(capacityId);
     }
 }

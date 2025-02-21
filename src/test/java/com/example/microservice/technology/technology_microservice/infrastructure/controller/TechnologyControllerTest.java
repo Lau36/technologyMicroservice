@@ -1,25 +1,9 @@
 package com.example.microservice.technology.technology_microservice.infrastructure.controller;
 
-import com.example.microservice.technology.technology_microservice.application.handler.ITechnologyRestHandler;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
-import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
-import com.example.microservice.technology.technology_microservice.domain.utils.SortDirection;
 import com.example.microservice.technology.technology_microservice.infrastructure.in.TechnologyController;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
-
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 @WebFluxTest(TechnologyController.class)

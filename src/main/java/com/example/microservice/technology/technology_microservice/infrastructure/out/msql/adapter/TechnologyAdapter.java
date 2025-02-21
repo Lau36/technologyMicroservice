@@ -2,15 +2,17 @@ package com.example.microservice.technology.technology_microservice.infrastructu
 
 import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
+import com.example.microservice.technology.technology_microservice.domain.utils.PaginatedTechnologies;
+import com.example.microservice.technology.technology_microservice.domain.utils.Pagination;
+import com.example.microservice.technology.technology_microservice.domain.utils.TechnologyCapacity;
+import com.example.microservice.technology.technology_microservice.domain.utils.TechnologyWithIdAndName;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.entity.TechnologyCapacityEntity;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.entity.TechnologyEntity;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.mapper.TechnologyMapper;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.repository.ITechnologyCapacityRepository;
 import com.example.microservice.technology.technology_microservice.infrastructure.out.msql.repository.ITechnologyRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,9 +40,9 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
     }
 
     @Override
-    public Mono<PaginatedTechnologiesModel> getAllTechnologies(PaginationModel paginationModel) {
-        Sort sort = Sort.by(Sort.Direction.fromString(paginationModel.getSortDirection().name()), SORT);
-        PageRequest pageable = PageRequest.of(paginationModel.getPage(), paginationModel.getSize(), sort);
+    public Mono<PaginatedTechnologies> getAllTechnologies(Pagination pagination) {
+        Sort sort = Sort.by(Sort.Direction.fromString(pagination.getSortDirection().name()), SORT);
+        PageRequest pageable = PageRequest.of(pagination.getPage(), pagination.getSize(), sort);
         Mono<List<TechnologyModel>> technologies =
                 repository.findAllBy(pageable)
                         .map(this::toModel)
@@ -49,11 +51,11 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
         Mono<Long> totalElements = repository.count();
 
         return Mono.zip(technologies, totalElements).map(
-                tuple -> new PaginatedTechnologiesModel(
+                tuple -> new PaginatedTechnologies(
                         tuple.getT1(),
-                        paginationModel.getPage(),
+                        pagination.getPage(),
                         tuple.getT2(),
-                        (int) Math.ceil((double) tuple.getT2()) / paginationModel.getSize()
+                        (int) Math.ceil((double) tuple.getT2()) / pagination.getSize()
                 ));
     }
 
@@ -64,7 +66,7 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
     }
 
     @Override
-    public Mono<Void> saveAll(List<TechnologyCapacityModel> technologiesCapacityModelList) {
+    public Mono<Void> saveAll(List<TechnologyCapacity> technologiesCapacityModelList) {
 
         List<TechnologyCapacityEntity> entities = technologiesCapacityModelList.stream().map(
                 model -> new TechnologyCapacityEntity(model.getId(), model.getTechnologyId(), model.getCapacityId())
@@ -74,10 +76,10 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
     }
 
     @Override
-    public Flux<TechnologyWithNameModel> getAllTechnologiesByCapacityId(Long capacityId) {
+    public Flux<TechnologyWithIdAndName> getAllTechnologiesByCapacityId(Long capacityId) {
         return repository.findTechnologiesByCapacityId(capacityId)
                 .map(technology ->
-                        new TechnologyWithNameModel(
+                        new TechnologyWithIdAndName(
                                 technology.getId(),
                                 technology.getName()
                         ));

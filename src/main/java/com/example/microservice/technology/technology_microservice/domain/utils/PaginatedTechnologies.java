@@ -1,8 +1,10 @@
-package com.example.microservice.technology.technology_microservice.domain.model;
+package com.example.microservice.technology.technology_microservice.domain.utils;
+
+import com.example.microservice.technology.technology_microservice.domain.model.TechnologyModel;
 
 import java.util.List;
 
-public class PaginatedTechnologiesModel {
+public class PaginatedTechnologies {
 
     public List<TechnologyModel> getTechnologies() {
         return technologies;
@@ -36,7 +38,7 @@ public class PaginatedTechnologiesModel {
         this.technologies = technologies;
     }
 
-    public PaginatedTechnologiesModel(List<TechnologyModel> technologies, int currentPage, Long totalElements, int totalPages) {
+    public PaginatedTechnologies(List<TechnologyModel> technologies, int currentPage, Long totalElements, int totalPages) {
         this.technologies = technologies;
         this.currentPage = currentPage;
         this.totalElements = totalElements;

@@ -1,8 +1,8 @@
-package com.example.microservice.technology.technology_microservice.domain.model;
+package com.example.microservice.technology.technology_microservice.domain.utils;
 
 import java.util.List;
 
-public class TechnologiesCapacityModel {
+public class TechnologiesCapacity {
     public List<Long> getTechnologiesId() {
         return technologiesId;
     }
@@ -27,7 +27,7 @@ public class TechnologiesCapacityModel {
         this.id = id;
     }
 
-    public TechnologiesCapacityModel(Long id, Long capacityId, List<Long> technologiesId) {
+    public TechnologiesCapacity(Long id, Long capacityId, List<Long> technologiesId) {
         this.id = id;
         this.capacityId = capacityId;
         this.technologiesId = technologiesId;

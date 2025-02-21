@@ -1,13 +1,11 @@
-package com.example.microservice.technology.technology_microservice.domain.model;
+package com.example.microservice.technology.technology_microservice.domain.utils;
 
-import com.example.microservice.technology.technology_microservice.domain.utils.SortDirection;
-
-public class PaginationModel {
+public class Pagination {
     private int page;
     private int size;
     private SortDirection sortDirection;
 
-    public PaginationModel(int page, int size, SortDirection sortDirection) {
+    public Pagination(int page, int size, SortDirection sortDirection) {
         this.page = page;
         this.size = size;
         this.sortDirection = sortDirection;

@@ -1,7 +1,7 @@
-package com.example.microservice.technology.technology_microservice.domain.model;
+package com.example.microservice.technology.technology_microservice.domain.utils;
 
-public class TechnologyWithNameModel {
-    public TechnologyWithNameModel(Long id, String name) {
+public class TechnologyWithIdAndName {
+    public TechnologyWithIdAndName(Long id, String name) {
         this.id = id;
         this.name = name;
     }

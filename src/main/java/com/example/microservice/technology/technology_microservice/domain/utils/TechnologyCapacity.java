@@ -1,8 +1,8 @@
-package com.example.microservice.technology.technology_microservice.domain.model;
+package com.example.microservice.technology.technology_microservice.domain.utils;
 
-public class TechnologyCapacityModel {
+public class TechnologyCapacity {
 
-    public TechnologyCapacityModel(Long id, Long technologyId, Long capacityId) {
+    public TechnologyCapacity(Long id, Long technologyId, Long capacityId) {
         this.id = id;
         TechnologyId = technologyId;
         CapacityId = capacityId;

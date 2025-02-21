@@ -5,9 +5,8 @@ import com.example.microservice.technology.technology_microservice.application.d
 import com.example.microservice.technology.technology_microservice.application.dto.request.TechnologyRequest;
 import com.example.microservice.technology.technology_microservice.application.dto.response.TechnologyResponse;
 import com.example.microservice.technology.technology_microservice.application.handler.ITechnologyRestHandler;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginatedTechnologiesModel;
-import com.example.microservice.technology.technology_microservice.domain.model.PaginationModel;
-import com.example.microservice.technology.technology_microservice.domain.model.TechnologyWithNameModel;
+import com.example.microservice.technology.technology_microservice.domain.utils.PaginatedTechnologies;
+import com.example.microservice.technology.technology_microservice.domain.utils.Pagination;
 import com.example.microservice.technology.technology_microservice.domain.utils.SortDirection;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.microservice.technology.technology_microservice.infrastructure.utils.constans.ConstansInfra.TECHNOLOGY_PATH;
+import static com.example.microservice.technology.technology_microservice.infrastructure.utils.constans.ConstansInfra.*;
 
 @RestController()
 @AllArgsConstructor
@@ -35,27 +34,27 @@ public class TechnologyController {
     }
 
     @GetMapping
-    public Mono<PaginatedTechnologiesModel> getTechnologiesPaginated(@RequestParam int page,
-                                                                     @RequestParam int size,
-                                                                     @RequestParam String sortDirection) {
-        PaginationModel pagination = new PaginationModel(page, size, SortDirection.valueOf(sortDirection.toUpperCase()));
+    public Mono<PaginatedTechnologies> getTechnologiesPaginated(@RequestParam int page,
+                                                                @RequestParam int size,
+                                                                @RequestParam String sortDirection) {
+        Pagination pagination = new Pagination(page, size, SortDirection.valueOf(sortDirection.toUpperCase()));
         return technologyRestHandler.getTechnologies(pagination);
     }
 
-    @PostMapping("/exists")
+    @PostMapping(EXISTS_TECHNOLOGY_PATH)
     public Mono<Boolean> existTechnologies(@RequestBody TechnologiesIdsRequest technologiesIdsRequest) {
         List<Long> ids = technologiesIdsRequest.getTechnologiesIds().stream().map(Long::parseLong).collect(Collectors.toList());
         return technologyRestHandler.existTechnologiesByIds(ids);
     }
 
-    @PostMapping("/asociate")
+    @PostMapping(ASOCIATE_TECHNOLOGY_PATH)
     public Mono<ResponseEntity<Void>> associateTechnologies(@RequestBody TechnologiesCapacityRequest request) {
         return technologyRestHandler.associateTechnologiesAndCapacities(request)
                 .then(Mono.just(ResponseEntity.status(HttpStatus.CREATED).build()));
 
     }
 
-    @GetMapping("/get")
+    @GetMapping(GET_TECHNOLOGIES_BY_CAPACITY_PATH)
     public Flux<TechnologyResponse> getTechnologies(@RequestParam Integer capacityId) {
         return technologyRestHandler.getAllTechnologiesByCapacityId(capacityId.longValue()).map(
                 technology ->

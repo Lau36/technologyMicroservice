@@ -6,6 +6,7 @@ import com.example.microservice.technology.technology_microservice.domain.except
 import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.in.ITechnologyServicePort;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
+import com.example.microservice.technology.technology_microservice.domain.utils.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -48,8 +49,8 @@ public class TechnologyUseCase implements ITechnologyServicePort {
     }
 
     @Override
-    public Mono<PaginatedTechnologiesModel> listTechnologies(PaginationModel paginationModel) {
-        return technologyPersistencePort.getAllTechnologies(paginationModel);
+    public Mono<PaginatedTechnologies> listTechnologies(Pagination pagination) {
+        return technologyPersistencePort.getAllTechnologies(pagination);
     }
 
     @Override
@@ -58,22 +59,22 @@ public class TechnologyUseCase implements ITechnologyServicePort {
     }
 
     @Override
-    public Mono<Void> associateTechnologiesAndCapacities(TechnologiesCapacityModel technologiesCapacityModel) {
-        return technologyPersistencePort.existTechnologiesByIds(technologiesCapacityModel.getTechnologiesId())
+    public Mono<Void> associateTechnologiesAndCapacities(TechnologiesCapacity technologiesCapacity) {
+        return technologyPersistencePort.existTechnologiesByIds(technologiesCapacity.getTechnologiesId())
                 .flatMap(exist -> {
                     if (!exist) {
                         return Mono.error(new IllegalArgumentException(SOME_TECHNOLOGIES_DOESNT_EXISTS));
                     }
 
-                    List<TechnologyCapacityModel> associations = technologiesCapacityModel.getTechnologiesId().stream()
-                            .map(techId -> new TechnologyCapacityModel(null, techId, technologiesCapacityModel.getCapacityId())).toList();
+                    List<TechnologyCapacity> associations = technologiesCapacity.getTechnologiesId().stream()
+                            .map(techId -> new TechnologyCapacity(null, techId, technologiesCapacity.getCapacityId())).toList();
 
                     return technologyPersistencePort.saveAll(associations).then();
                 });
     }
 
     @Override
-    public Flux<TechnologyWithNameModel> getAllTechnologiesByCapacityId(Long capacityId) {
+    public Flux<TechnologyWithIdAndName> getAllTechnologiesByCapacityId(Long capacityId) {
         return technologyPersistencePort.getAllTechnologiesByCapacityId(capacityId);
     }
 

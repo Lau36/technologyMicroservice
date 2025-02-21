@@ -5,8 +5,8 @@ import com.example.microservice.technology.technology_microservice.domain.except
 import com.example.microservice.technology.technology_microservice.domain.exceptions.NameTooLongException;
 import com.example.microservice.technology.technology_microservice.domain.model.*;
 import com.example.microservice.technology.technology_microservice.domain.ports.out.ITechnologyPersistencePort;
+import com.example.microservice.technology.technology_microservice.domain.utils.*;
 import com.example.microservice.technology.technology_microservice.domain.useCase.TechnologyUseCase;
-import com.example.microservice.technology.technology_microservice.domain.utils.SortDirection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -89,27 +89,27 @@ public class TechnologyUseCaseTest {
     @Test
     void listAllTechnologies_shouldReturnPaginatedData(){
 
-        PaginationModel paginationModel = new PaginationModel(0, 10, SortDirection.ASC);
+        Pagination pagination = new Pagination(0, 10, SortDirection.ASC);
 
         List<TechnologyModel> technologies = List.of(
                 new TechnologyModel(1L, "React", "Frontend Framework"),
                 new TechnologyModel(2L, "Spring Boot", "Backend Framework")
         );
 
-        PaginatedTechnologiesModel expectedPage = new PaginatedTechnologiesModel(
+        PaginatedTechnologies expectedPage = new PaginatedTechnologies(
                 technologies, 0, 2L, 1
         );
 
-        when(technologyPersistencePort.getAllTechnologies(paginationModel))
+        when(technologyPersistencePort.getAllTechnologies(pagination))
                 .thenReturn(Mono.just(expectedPage));
 
-        Mono<PaginatedTechnologiesModel> result = technologyUseCase.listTechnologies(paginationModel);
+        Mono<PaginatedTechnologies> result = technologyUseCase.listTechnologies(pagination);
 
         StepVerifier.create(result)
                 .expectNext(expectedPage)
                 .verifyComplete();
 
-        verify(technologyPersistencePort, times(1)).getAllTechnologies(paginationModel);
+        verify(technologyPersistencePort, times(1)).getAllTechnologies(pagination);
     }
 
     @Test
@@ -144,12 +144,12 @@ public class TechnologyUseCaseTest {
 
     @Test
     void getAllTechnologies_shouldReturnTechnologies(){
-        TechnologyWithNameModel technology = new TechnologyWithNameModel(1L, "Technology 1");
+        TechnologyWithIdAndName technology = new TechnologyWithIdAndName(1L, "Technology 1");
         Long capacityId = 1L;
 
         Mockito.when(technologyPersistencePort.getAllTechnologiesByCapacityId(capacityId)).thenReturn(Flux.just(technology));
 
-        Flux<TechnologyWithNameModel> result = technologyUseCase.getAllTechnologiesByCapacityId(capacityId);
+        Flux<TechnologyWithIdAndName> result = technologyUseCase.getAllTechnologiesByCapacityId(capacityId);
 
         StepVerifier.create(result).expectNext(technology).verifyComplete();
 
@@ -162,7 +162,7 @@ public class TechnologyUseCaseTest {
         List<Long> techIds = List.of(1L, 2L, 3L);
         Long capacityId = 100L;
         Long technologyId = 10L;
-        TechnologiesCapacityModel inputModel = new TechnologiesCapacityModel(technologyId, capacityId, techIds);
+        TechnologiesCapacity inputModel = new TechnologiesCapacity(technologyId, capacityId, techIds);
 
         Mockito.when(technologyPersistencePort.existTechnologiesByIds(techIds)).thenReturn(Mono.just(true));
         Mockito.when(technologyPersistencePort.saveAll(Mockito.anyList())).thenReturn(Mono.empty());
@@ -184,7 +184,7 @@ public class TechnologyUseCaseTest {
         List<Long> techIds = List.of(1L, 2L, 3L);
         Long capacityId = 100L;
         Long technologyId = 10L;
-        TechnologiesCapacityModel inputModel = new TechnologiesCapacityModel(technologyId, capacityId, techIds);
+        TechnologiesCapacity inputModel = new TechnologiesCapacity(technologyId, capacityId, techIds);
 
         when(technologyPersistencePort.existTechnologiesByIds(techIds)).thenReturn(Mono.just(false));
 
@@ -205,7 +205,7 @@ public class TechnologyUseCaseTest {
         List<Long> techIds = List.of(1L, 2L, 3L);
         Long capacityId = 100L;
         Long technologyId = 10L;
-        TechnologiesCapacityModel inputModel = new TechnologiesCapacityModel(technologyId, capacityId, techIds);
+        TechnologiesCapacity inputModel = new TechnologiesCapacity(technologyId, capacityId, techIds);
 
         when(technologyPersistencePort.existTechnologiesByIds(techIds)).thenReturn(Mono.just(true));
         when(technologyPersistencePort.saveAll(anyList())).thenReturn(Mono.error(new RuntimeException("DB Error")));
