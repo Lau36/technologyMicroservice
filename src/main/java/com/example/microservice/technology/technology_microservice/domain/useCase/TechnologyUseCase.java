@@ -24,24 +24,23 @@ public class TechnologyUseCase implements ITechnologyServicePort {
 
     @Override
     public Mono<Void> createTechnology(TechnologyModel technologyModel) {
-        return validateTechnologyAndNameLenght(technologyModel)
-                .then(existTechnology(technologyModel.getName()))
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.error(new AlreadyExistsException(TECHNOLOGY_NAME_ALREADY_EXISTS));
-                    }
-                    return technologyPersistencePort.saveTechnology(technologyModel);
-                });
+        return validationsTechnology(technologyModel).then(technologyPersistencePort.saveTechnology(technologyModel));
     }
 
-    public Mono<Void> validateTechnologyAndNameLenght(TechnologyModel technologyModel) {
+    public Mono<Void> validationsTechnology(TechnologyModel technologyModel) {
         if(technologyModel.getName().length() > MAX_LENGTH_TECHNOLOGY_NAME){
-            return Mono.error(new NameTooLongException(String.format(TECHNOLOGY_NAME_TOO_LONG, MAX_LENGTH_TECHNOLOGY_NAME)));
+            return Mono.error(new NameTooLongException(
+                    String.format(TECHNOLOGY_NAME_TOO_LONG, MAX_LENGTH_TECHNOLOGY_NAME)));
         }
         if(technologyModel.getDescription().length() > MAX_LENGTH_TECHNOLOGY_DESCRIPTION){
-            return Mono.error(new DescriptionTooLongException(String.format(TECHNOLOGY_DESCRIPTION_TOO_LONG, MAX_LENGTH_TECHNOLOGY_DESCRIPTION)));
+            return Mono.error(new DescriptionTooLongException(
+                    String.format(TECHNOLOGY_DESCRIPTION_TOO_LONG, MAX_LENGTH_TECHNOLOGY_DESCRIPTION)));
         }
-        return Mono.empty();
+
+        return existTechnology(technologyModel.getName()).flatMap(
+                exist ->
+                        exist ? Mono.error(new AlreadyExistsException( String.format(TECHNOLOGY_NAME_ALREADY_EXISTS, technologyModel.getName()))) : Mono.empty()
+                );
     }
 
     public Mono<Boolean> existTechnology(String technologyName) {

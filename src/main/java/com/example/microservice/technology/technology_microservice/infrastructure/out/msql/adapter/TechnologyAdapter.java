@@ -30,7 +30,8 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
 
     @Override
     public Mono<Void> saveTechnology(TechnologyModel technologyModel) {
-        TechnologyEntity entity = new TechnologyEntity(technologyModel.getId(), technologyModel.getName(), technologyModel.getDescription());
+        TechnologyEntity entity = new TechnologyEntity(
+                technologyModel.getId(), technologyModel.getName(), technologyModel.getDescription());
         return repository.save(entity).then();
     }
 
@@ -43,6 +44,7 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
     public Mono<PaginatedTechnologies> getAllTechnologies(Pagination pagination) {
         Sort sort = Sort.by(Sort.Direction.fromString(pagination.getSortDirection().name()), SORT);
         PageRequest pageable = PageRequest.of(pagination.getPage(), pagination.getSize(), sort);
+
         Mono<List<TechnologyModel>> technologies =
                 repository.findAllBy(pageable)
                         .map(this::toModel)
@@ -69,7 +71,8 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
     public Mono<Void> saveAll(List<TechnologyCapacity> technologiesCapacityModelList) {
 
         List<TechnologyCapacityEntity> entities = technologiesCapacityModelList.stream().map(
-                model -> new TechnologyCapacityEntity(model.getId(), model.getTechnologyId(), model.getCapacityId())
+                model ->
+                        new TechnologyCapacityEntity(model.getId(), model.getTechnologyId(), model.getCapacityId())
         ).toList();
 
         return technologyCapacityRepository.saveAll(entities).then();
@@ -86,7 +89,8 @@ public class TechnologyAdapter implements ITechnologyPersistencePort {
     }
 
     public TechnologyModel toModel(TechnologyEntity technologyEntity) {
-        return new TechnologyModel(technologyEntity.getId(), technologyEntity.getName(), technologyEntity.getDescription());
+        return new TechnologyModel(
+                technologyEntity.getId(), technologyEntity.getName(), technologyEntity.getDescription());
     }
 
 

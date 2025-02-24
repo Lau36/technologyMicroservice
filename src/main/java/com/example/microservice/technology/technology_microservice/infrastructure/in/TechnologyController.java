@@ -60,6 +60,5 @@ public class TechnologyController {
                 technology ->
                         new TechnologyResponse(technology.getId(), technology.getName())
         );
-
     }
 }
